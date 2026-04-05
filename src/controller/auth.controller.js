@@ -26,7 +26,7 @@ async function signUp(req, res){
     }); 
  
 
-    const token = jwt.sign({ id: User._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ userId: User._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     
     res.status(201).json({ message: 'User registered successfully', User, token });
 
@@ -53,7 +53,7 @@ async function signIn(req, res){
         return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: User._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({  userId : User._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
 
     res.status(200).json({ message: 'User signed in successfully', User, token });
