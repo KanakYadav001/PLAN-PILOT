@@ -7,7 +7,7 @@ const memberSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    OrganizationId : {
+    organizationId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
         required: true,
