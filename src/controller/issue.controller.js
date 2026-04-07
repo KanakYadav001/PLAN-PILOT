@@ -115,6 +115,7 @@ async function getIssues(req, res) {
 
 async function updateIssue(req, res) {
   const userId = req.userId;
+
   const { orgId, teamId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -131,15 +132,37 @@ async function updateIssue(req, res) {
   }
 
   try {
-    const issue = await issueModel.findById(issueId);
+    // if the team exists in the organization
+    const teamExits = await teamModel.findOne({
+      _id: teamId,
+      organizationId: orgId,
+    });
+
+    // if the user is a member of the team
+    const isMember = await memberModel.findOne({
+      userId,
+      organizationId: orgId,
+    });
+
+    if (!teamExits) {
+      return res
+        .status(404)
+        .json({ message: "Team not found in the organization" });
+    }
+
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this team" });
+    }
 
     if (!issue) {
       return res.status(404).json({ message: "Issue not found" });
     }
 
-    await issueModel.findByIdAndUpdate();
+  const newIssueData = await issueModel.findByIdAndUpdate(issueId, req.body, { new: true });
 
-    res.status(200).json({ message: "Issue updated successfully" });
+    res.status(200).json({ message: "Issue updated successfully", issue: newIssueData });
   } catch (error) {
     console.error("Error updating issue:", error);
     return res.status(500).json({ message: "Error updating issue" });
