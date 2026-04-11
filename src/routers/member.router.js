@@ -4,13 +4,14 @@ const router = express.Router();
 
 const memberController = require("../controller/member.controller");
 
-
 const authMiddleware = require("../middleware/auth.middleware");
 
-router.post("/organization/:orgId", authMiddleware, memberController.createMember);
-router.delete("/organization/:orgId/:memberId", authMiddleware, memberController.deleteMember);
-
-
-
+router.get("/:orgId", authMiddleware, memberController.getMembers);
+router.post("/:orgId", authMiddleware, memberController.createMember);
+router.delete(
+  "/:orgId/:memberId",
+  authMiddleware,
+  memberController.deleteMember,
+);
 
 module.exports = router;
