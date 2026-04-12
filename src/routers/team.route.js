@@ -1,17 +1,18 @@
-const router = require("express")
+const express = require("express");
+
+const router = express.Router();
 
 const teamController = require("../controller/team.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
 
-
-router.post("/organization/:orgId", authMiddleware, teamController.createTeam);
-router.get("/organization/:teamId", authMiddleware, teamController.getTeamsByOrganization);
-router.delete("/organization/:teamId", authMiddleware, teamController.deleteTeam);
-router.get("/organization/:orgId", authMiddleware, teamController.getAllTeams);
-
-
-
-
+router.post("/:orgId", authMiddleware, teamController.createTeam);
+router.get(
+  "/:orgId/:teamId",
+  authMiddleware,
+  teamController.getTeamsByOrganization,
+);
+router.delete("/:orgId/:teamId", authMiddleware, teamController.deleteTeam);
+router.get("/:orgId", authMiddleware, teamController.getAllTeams);
 
 module.exports = router;

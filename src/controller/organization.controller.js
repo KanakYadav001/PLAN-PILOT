@@ -2,6 +2,7 @@ const orgModel = require("../models/organzition.model");
 const memberModel = require("../models/members.model");
 const teamsModel = require("../models/team.model");
 const mongoose = require("mongoose");
+
 async function createOrganization(req, res) {
   const userId = req.userId;
   const { name, description } = req.body;
@@ -21,6 +22,11 @@ async function createOrganization(req, res) {
       name,
       description,
       adminId: userId,
+    });
+
+    await memberModel.create({
+      userId,
+      organizationId: organization._id,
     });
 
     res
@@ -59,12 +65,13 @@ async function getOrganizationById(req, res) {
   try {
     // if user is not a member of the organization, return 403
 
-      const isMember = await memberModel.findOne({ userId, organizationId });
+    const isMember = await memberModel.findOne({ userId, organizationId });
 
-
-      if (!isMember) {
-        return res.status(403).json({ message: "Not a member of this organization" });
-      }
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "Not a member of this organization" });
+    }
 
     const teams = await teamsModel.find({ organizationId });
 
@@ -81,32 +88,26 @@ async function deleteOrganization(req, res) {
   const userId = req.userId;
   const organizationId = req.params.id;
 
-
   try {
-
     const organization = await orgModel.findById(organizationId);
     if (!organization) {
       return res.status(404).json({ message: "Organization not found" });
     }
     if (organization.adminId.toString() !== userId) {
-      return res.status(403).json({ message: "Not authorized to delete this organization" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this organization" });
     }
-
 
     await teamsModel.deleteMany({ organizationId });
     await memberModel.deleteMany({ organizationId });
 
-
     res.status(200).json({ message: "Organization deleted successfully" });
-
-
-  
+  } catch (error) {
+    console.error("Error deleting organization:", error);
+    return res.status(500).json({ message: "Error deleting organization" });
+  }
 }
-catch (error) { 
-  console.error("Error deleting organization:", error);
-  return res.status(500).json({ message: "Error deleting organization" });
-}
-} 
 module.exports = {
   createOrganization,
   getAllOrganizations,

@@ -5,7 +5,10 @@ const authMiddleware = require("../middleware/auth.middleware");
 
 router.post("/:orgId/:teamId", authMiddleware, issueController.createIssue);
 router.get("/:orgId/:teamId", authMiddleware, issueController.getIssues);
-router.patch("/:orgId/:teamId/:issueId", authMiddleware, issueController.updateIssue);
-
+router.put(
+  "/:orgId/:teamId/:issueId",
+  authMiddleware,
+  issueController.updateIssue,
+);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const issueModel = require("../models/issue.model");
+const issueModel = require("../models/issues.model");
 const mongoose = require("mongoose");
 const orgModel = require("../models/organzition.model");
 const teamModel = require("../models/team.model");
@@ -10,6 +10,8 @@ async function createIssue(req, res) {
 
   const teamId = req.params.teamId;
   const orgId = req.params.orgId;
+
+  console.log(teamId, orgId);
 
   if (!title || !description) {
     return res
@@ -116,7 +118,7 @@ async function getIssues(req, res) {
 async function updateIssue(req, res) {
   const userId = req.userId;
 
-  const { orgId, teamId } = req.params;
+  const { orgId, teamId, issueId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).json({ message: "Invalid user ID" });
@@ -156,13 +158,17 @@ async function updateIssue(req, res) {
         .json({ message: "You are not a member of this team" });
     }
 
-    if (!issue) {
+    const newIssueData = await issueModel.findByIdAndUpdate(issueId, req.body, {
+      new: true,
+    });
+
+    if (!newIssueData) {
       return res.status(404).json({ message: "Issue not found" });
     }
 
-  const newIssueData = await issueModel.findByIdAndUpdate(issueId, req.body, { new: true });
-
-    res.status(200).json({ message: "Issue updated successfully", issue: newIssueData });
+    res
+      .status(200)
+      .json({ message: "Issue updated successfully", issue: newIssueData });
   } catch (error) {
     console.error("Error updating issue:", error);
     return res.status(500).json({ message: "Error updating issue" });
